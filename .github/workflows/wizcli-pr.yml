@@ -27,7 +27,7 @@ jobs:
       - name: Convert findings with Copilot
         run: |
           set -euo pipefail
-          copilot --promt "Hello World!"
+          copilot --prompt "Hello World!"
       # - name: Run Security Agent via Copilot CLI
       #   env:
       #     COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
