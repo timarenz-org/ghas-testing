@@ -25,7 +25,10 @@ jobs:
         run: npm i -g @github/copilot
 
       - name: Convert findings with Copilot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+
           set -euo pipefail
           copilot --prompt "Hello World!"
       # - name: Run Security Agent via Copilot CLI
