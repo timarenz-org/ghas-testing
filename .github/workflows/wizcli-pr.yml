@@ -1,0 +1,56 @@
+name: "WizCLI PR scanning"
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Write permissions are required for pull-requests comments
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install GitHub Copilot CLI
+        run: npm i -g @github/copilot
+
+      - name: Convert findings with Copilot
+        run: |
+          set -euo pipefail
+          copilot --promt "Hello World!"
+      # - name: Run Security Agent via Copilot CLI
+      #   env:
+      #     COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      #     GITHUB_REPOSITORY: ${{ github.repository }}
+      #   run: |
+      #     set -euo pipefail
+      #     # Construct the Prompt
+      #     # We combine the System Prompt (Agent definition) with Dynamic Context
+      #     AGENT_PROMPT=$(cat .github/agents/security-reporter.agent.md)
+      #     PROMPT="$AGENT_PROMPT"
+      #     PROMPT+=$'\n\nContext:\n'
+      #     PROMPT+="- Repository: $GITHUB_REPOSITORY"
+      #     PROMPT+=$'\n\nTask:\n'
+      #     PROMPT+=$"\n- Execute the instructions on the full codebase"
+      #     PROMPT+=$'\n- Generate the security report at /security-reports/security-assessment-report.md'
+      #     # Execute Copilot
+      #     # We use < /dev/null to prevent the CLI from waiting for interactive input
+      #     copilot --prompt "$PROMPT" --allow-all-tools --allow-all-paths < /dev/null
+      - name: "Dependency Review"
+        uses: actions/dependency-review-action@v4
+        # Commonly enabled options, see https://github.com/actions/dependency-review-action#configuration-options for all available options.
+        with:
+          comment-summary-in-pr: always
+        #   fail-on-severity: moderate
+        #   deny-licenses: GPL-1.0-or-later, LGPL-2.0-or-later
+        #   retry-on-snapshot-warnings: true
